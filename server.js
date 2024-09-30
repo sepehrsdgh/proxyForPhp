@@ -5,6 +5,7 @@ const app = express();
 
 // Middleware for CORS
 app.use((req, res, next) => {
+  console.log(req);
   res.setHeader("Access-Control-Allow-Origin", "http://127.0.0.1:8000");
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader(
