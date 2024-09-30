@@ -5,8 +5,7 @@ const app = express();
 
 // Middleware for CORS
 app.use((req, res, next) => {
-  console.log(req);
-  res.setHeader("Access-Control-Allow-Origin", "http://127.0.0.1:8000");
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -16,15 +15,27 @@ app.use((req, res, next) => {
   next();
 });
 
-// Proxy to the external API
-app.use(
-  "/api",
+// Proxy only for the specific route
+app.post(
+  "/api/v1/auth/login/otp",
   createProxyMiddleware({
     target: "https://ritmify.com",
     changeOrigin: true,
     pathRewrite: {
-      "^/api": "/api", // Adjust path if necessary
+      "^/api/v1/auth/login/otp": "/api/v1/auth/login/otp", // Keep the same path
     },
+    onProxyReq: (proxyReq, req, res) => {
+      console.log(`Proxying request to: ${proxyReq.protocol}//${proxyReq.host}${proxyReq.path}`);
+      console.log(`Request Method: ${req.method}`);
+      console.log(`Request Headers:`, req.headers);
+      console.log(`Request Body:`, req.body);
+    },
+    onProxyRes: (proxyRes, req, res) => {
+      console.log(`Received response with status: ${proxyRes.statusCode}`);
+    },
+    onError: (err, req, res) => {
+      console.error(`Error during proxy:`, err);
+    }
   })
 );
 
